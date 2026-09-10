@@ -52,12 +52,6 @@ function showToast(message, isError = false) {
     }, 3000);
 }
 
-// Fungsi Format Rupiah
-function formatRupiah(angka) {
-    if (!angka) return "Rp 0";
-    return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(angka);
-}
-
 function switchScreen(screenName) {
     Object.values(screens).forEach(s => s.classList.add('hidden'));
     screens[screenName].classList.remove('hidden');
