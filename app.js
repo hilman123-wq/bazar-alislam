@@ -400,8 +400,8 @@ async function fetchDataSantri() {
 
     if (response.success) {
         tbody.innerHTML = ''; 
-        if(response.data.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="5" style="text-align: center;">Belum ada data santri</td></tr>';
+        if(!response.data || response.data.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="5" style="text-align: center;">Belum ada data santri. Silakan isi di Spreadsheet.</td></tr>';
             return;
         }
 
@@ -437,8 +437,8 @@ async function fetchDataPedagang() {
 
     if (response.success) {
         tbody.innerHTML = ''; 
-        if(response.data.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="5" style="text-align: center;">Belum ada data pedagang</td></tr>';
+        if(!response.data || response.data.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="5" style="text-align: center;">Belum ada data pedagang. Silakan isi di Spreadsheet.</td></tr>';
             return;
         }
 
