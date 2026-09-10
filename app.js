@@ -355,3 +355,26 @@ document.getElementById('btn-logout').addEventListener('click', handleLogout);
 ui.menuToggle.addEventListener('click', () => {
     ui.sidebar.classList.toggle('active');
 });
+
+// --- FUNGSI EVENT LISTENERS ---
+function setupEventListeners() {
+    // 1. Event Listener untuk Form Login
+    const loginForm = document.getElementById('login-form');
+    if (loginForm) {
+        loginForm.addEventListener('submit', handleLogin);
+    }
+
+    // 2. Event Listener untuk Tombol Logout (jika ada)
+    const logoutBtn = document.getElementById('btn-logout');
+    if (logoutBtn) {
+        logoutBtn.addEventListener('click', function() {
+            // Hapus token dan reload halaman
+            localStorage.removeItem('session_token');
+            localStorage.removeItem('user_data');
+            window.location.reload();
+        });
+    }
+
+    // Tambahkan event listener lain di sini nanti jika diperlukan
+    // (misalnya tombol menu, tombol scan QR, dll)
+}
