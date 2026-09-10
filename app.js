@@ -58,11 +58,23 @@ function switchScreen(screenName) {
 }
 
 function switchView(viewName) {
-    Object.values(views).forEach(v => v.classList.add('hidden'));
-    views[viewName].classList.remove('hidden');
+    // 1. Sembunyikan semua halaman dengan AMAN (Anti-Crash)
+    Object.values(views).forEach(v => {
+        if (v) v.classList.add('hidden');
+    });
     
-    // Cleanup scanner if navigating away from scan view
-    if (viewName !== 'scan' && html5QrcodeScanner) {
+    // 2. Tampilkan halaman yang diminta
+    if (views[viewName]) {
+        views[viewName].classList.remove('hidden');
+    } else {
+        // Jika HTML-nya belum ter-update, munculkan peringatan
+        showToast("Halaman belum siap. Coba Refresh (Ctrl+F5)!", true);
+        // Kembalikan ke dashboard agar tidak blank
+        if (views.dashboard) views.dashboard.classList.remove('hidden');
+    }
+    
+    // Cleanup scanner jika keluar dari menu scan
+    if (viewName !== 'scan' && typeof html5QrcodeScanner !== 'undefined' && html5QrcodeScanner) {
         html5QrcodeScanner.clear().catch(e => console.error("Scanner clear error", e));
         html5QrcodeScanner = null;
     }
