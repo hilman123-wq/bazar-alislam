@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bazar Pondok Al-Islam</title>
+    <link rel="stylesheet" href="style.css">
+    <!-- Include HTML5 QR Code Scanner -->
+    <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
+</head>
+<body>
+
+    <!-- NOTIFICATION TOAST -->
+    <div id="toast" class="toast hidden">
+        <span id="toast-msg">Message here</span>
+    </div>
+
+    <!-- LOADING OVERLAY -->
+    <div id="loading" class="loading-overlay hidden">
+        <div class="spinner"></div>
+        <p>Memproses...</p>
+    </div>
+
+    <!-- APP CONTAINER -->
+    <div id="app-container">
+        
+        <!-- LOGIN SCREEN -->
+        <div id="login-screen" class="screen view-box">
+            <div class="login-card card">
+                <h2>Bazar Pondok Al-Islam</h2>
+                <p>Silakan masuk ke sistem</p>
+                <form id="login-form">
+                    <div class="form-group">
+                        <label>Username</label>
+                        <input type="text" id="username" required placeholder="Masukkan username">
+                    </div>
+                    <div class="form-group">
+                        <label>Password</label>
+                        <input type="password" id="password" required placeholder="Masukkan password">
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-block">LOGIN</button>
+                </form>
+                <div class="demo-info" style="margin-top:20px; font-size: 0.8rem; color: #666; text-align:center;">
+                    <p>Demo Akun:</p>
+                    <p>admin / admin123 (Admin)</p>
+                    <p>pedagang01 / pedagang123 (Pedagang)</p>
+                    <p>edc_banin / edc123 (EDC)</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- MAIN DASHBOARD SCREEN (For Logged in Users) -->
+        <div id="main-screen" class="screen hidden">
+            <!-- TOP NAVBAR -->
+            <nav class="topbar">
+                <div class="topbar-left">
+                    <button id="menu-toggle" class="btn-icon">☰</button>
+                    <h3>Bazar Al-Islam</h3>
+                </div>
+                <div class="topbar-right">
+                    <span id="user-info">User</span>
+                    <button id="btn-logout" class="btn btn-sm btn-danger">Logout</button>
+                </div>
+            </nav>
+
+            <div class="app-body">
+                <!-- SIDEBAR -->
+                <aside id="sidebar" class="sidebar">
+                    <ul id="nav-links" class="nav-list">
+                        <!-- Links injected by JS based on role -->
+                    </ul>
+                </aside>
+
+                <!-- MAIN CONTENT AREA -->
+                <main class="content-area">
+                    
+                    <!-- VIEWS (Only one active at a time) -->
+                    
+                    <!-- 1. DASHBOARD VIEW -->
+                    <div id="view-dashboard" class="view hidden">
+                        <h2>Dashboard <span id="dash-role-badge" class="badge badge-primary"></span></h2>
+                        <div id="dashboard-widgets" class="widget-grid">
+                            <!-- Widgets injected by JS -->
+                        </div>
+                    </div>
+
+                    <!-- 2. SCAN VOUCHER VIEW (PEDAGANG) -->
+                    <div id="view-scan" class="view hidden">
+                        <h2>Scan Voucher</h2>
+                        <div class="card scan-card">
+                            <div id="qr-reader" style="width:100%; max-width:400px; margin:auto;"></div>
+                            
+                            <div class="divider">ATAU INPUT MANUAL</div>
+                            
+                            <div class="form-group">
+                                <label>Token Voucher (Manual)</label>
+                                <input type="text" id="manual-token" placeholder="Masukkan token jika kamera gagal">
+                                <button id="btn-manual-cek" class="btn btn-secondary btn-block mt-1">Cek Voucher</button>
+                            </div>
+                        </div>
+
+                        <!-- Scan Result Modal/Section (Hidden initially) -->
+                        <div id="scan-result" class="card mt-2 hidden">
+                            <h3 style="color:var(--primary-color);">Voucher Valid ✓</h3>
+                            <table class="detail-table">
+                                <tr><td>Santri</td><td id="scan-santri"></td></tr>
+                                <tr><td>Sisa Saldo</td><td id="scan-saldo" style="font-size:1.5rem; font-weight:bold;"></td></tr>
+                            </table>
+                            <div class="form-group mt-2">
+                                <label>Nominal Belanja (Rp)</label>
+                                <input type="number" id="nominal-belanja" placeholder="Contoh: 15000" required>
+                            </div>
+                            <input type="hidden" id="active-qr-token">
+                            <button id="btn-proses-trx" class="btn btn-primary btn-block btn-lg">PROSES TRANSAKSI</button>
+                            <button id="btn-batal-trx" class="btn btn-danger btn-block mt-1">Batal</button>
+                        </div>
+                    </div>
+
+                    <!-- 3. TERBITKAN VOUCHER (EDC) -->
+                    <div id="view-terbit-voucher" class="view hidden">
+                        <h2>Terbitkan Voucher Baru</h2>
+                        <div class="card">
+                            <form id="form-terbit-voucher">
+                                <div class="form-group">
+                                    <label>Pilih Santri</label>
+                                    <select id="select-santri" required>
+                                        <option value="">-- Pilih Santri --</option>
+                                        <!-- Options populated by JS -->
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label>Kegiatan Bazar</label>
+                                    <select id="select-kegiatan" required>
+                                        <option value="">-- Pilih Kegiatan --</option>
+                                        <!-- Options populated by JS -->
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label>Nominal Voucher (Rp)</label>
+                                    <input type="number" id="voucher-nominal" required placeholder="Contoh: 50000">
+                                </div>
+                                <div class="form-group">
+                                    <label>Nomor Referensi EDC</label>
+                                    <input type="text" id="voucher-ref" required placeholder="Input No. Ref dari Struk EDC">
+                                </div>
+                                <button type="submit" class="btn btn-primary btn-block btn-lg">TERBITKAN VOUCHER</button>
+                            </form>
+                        </div>
+                    </div>
+
+                    <!-- SUCCESS VOUCHER PRINT VIEW -->
+                    <div id="view-print-voucher" class="view hidden">
+                         <div class="voucher-ticket" id="voucher-print-area">
+                             <h4>BAZAR PONDOK AL-ISLAM</h4>
+                             <p><strong>Voucher Jajan</strong></p>
+                             <hr>
+                             <div class="qr-placeholder" id="voucher-qr-display">[ QR CODE ]</div>
+                             <p style="font-size:0.8rem; word-break:break-all;" id="voucher-token-text"></p>
+                             <table class="voucher-info">
+                                 <tr><td>Nominal:</td><td id="v-print-nominal"></td></tr>
+                                 <tr><td>ID:</td><td id="v-print-id"></td></tr>
+                                 <tr><td>Tgl:</td><td id="v-print-tgl"></td></tr>
+                             </table>
+                             <hr>
+                             <p style="font-size:0.7rem;">Gunakan QR ini untuk berbelanja.</p>
+                         </div>
+                         <button onclick="window.print()" class="btn btn-secondary btn-block mt-2">CETAK (PRINT)</button>
+                         <button id="btn-back-terbit" class="btn btn-primary btn-block mt-1">Kembali</button>
+                    </div>
+
+
+                </main>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="config.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
