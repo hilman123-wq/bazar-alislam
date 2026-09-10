@@ -3,10 +3,7 @@
 // ==========================================
 
 // WARNING: REPLACE THIS URL WITH YOUR ACTUAL DEPLOYED GOOGLE APPS SCRIPT WEB APP URL
-const CONFIG = {
-    // API_URL: "https://script.google.com/macros/s/AKfycb.../exec", // Example format
-    API_URL: "YOUR_APPS_SCRIPT_WEB_APP_URL_HERE", 
-};
+const API_URL = "https://script.google.com/macros/s/AKfycbzsEtpGNTw-I_-uXEvwpiThrppacJuUB5oCJDIzztI6d4nuyq1HVdOGXdqp35CurTw/exec";
 
 // Format Rupiah utility
 const formatRupiah = (number) => {
