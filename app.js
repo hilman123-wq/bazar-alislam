@@ -15,7 +15,10 @@ const views = {
     dashboard: document.getElementById('view-dashboard'),
     scan: document.getElementById('view-scan'),
     terbitVoucher: document.getElementById('view-terbit-voucher'),
-    printVoucher: document.getElementById('view-print-voucher')
+    printVoucher: document.getElementById('view-print-voucher'),
+    santri: document.getElementById('view-santri'),
+    pedagang: document.getElementById('view-pedagang'),
+    laporan: document.getElementById('view-laporan')
 };
 
 const ui = {
@@ -47,6 +50,12 @@ function showToast(message, isError = false) {
     setTimeout(() => {
         ui.toast.classList.add('hidden');
     }, 3000);
+}
+
+// Fungsi Format Rupiah
+function formatRupiah(angka) {
+    if (!angka) return "Rp 0";
+    return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(angka);
 }
 
 function switchScreen(screenName) {
@@ -149,8 +158,9 @@ function setupUserInterface() {
     let navHtml = `<li><a href="#" onclick="loadDashboard(); return false;">Dashboard</a></li>`;
     
     if (currentUser.role === 'ADMIN') {
-        navHtml += `<li><a href="#" onclick="showToast('Fitur Master Data dalam pengembangan'); return false;">Master Data</a></li>`;
-        navHtml += `<li><a href="#" onclick="showToast('Fitur Laporan dalam pengembangan'); return false;">Laporan</a></li>`;
+       navHtml += `<li><a href="#" onclick="fetchDataSantri(); return false;">Master Santri</a></li>`;
+        navHtml += `<li><a href="#" onclick="fetchDataPedagang(); return false;">Master Pedagang</a></li>`;
+        navHtml += `<li><a href="#" onclick="loadLaporan(); return false;">Laporan</a></li>`;
     } 
     else if (currentUser.role === 'PEDAGANG') {
         navHtml += `<li><a href="#" onclick="initScanVoucher(); return false;">Scan Voucher</a></li>`;
@@ -374,7 +384,88 @@ function setupEventListeners() {
             window.location.reload();
         });
     }
+}
 
-    // Tambahkan event listener lain di sini nanti jika diperlukan
-    // (misalnya tombol menu, tombol scan QR, dll)
+// ==========================================
+// FUNGSI MASTER DATA & LAPORAN (ADMIN)
+// ==========================================
+
+// 4. MASTER SANTRI
+async function fetchDataSantri() {
+    switchView('santri'); // Pindah ke halaman santri
+    ui.sidebar.classList.remove('active'); // Tutup sidebar di HP
+
+    const tbody = document.getElementById('tbody-santri');
+    if (!tbody) return; // Mencegah error jika elemen tidak ditemukan
+    
+    tbody.innerHTML = '<tr><td colspan="5" style="text-align: center;">Memuat data...</td></tr>';
+    
+    showLoading(true);
+    const response = await api('getSantri');
+    showLoading(false);
+
+    if (response.success) {
+        tbody.innerHTML = ''; 
+        if(response.data.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="5" style="text-align: center;">Belum ada data santri</td></tr>';
+            return;
+        }
+
+        response.data.forEach(santri => {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td>${santri.santri_id}</td>
+                <td>${santri.nama}</td>
+                <td>${santri.kelas}</td>
+                <td>${santri.lokasi}</td>
+                <td><span class="badge" style="background:${santri.status === 'AKTIF' ? 'green' : 'red'}; color:white; padding:3px 8px; border-radius:4px;">${santri.status}</span></td>
+            `;
+            tbody.appendChild(tr);
+        });
+    } else {
+        tbody.innerHTML = `<tr><td colspan="5" style="text-align: center; color: red;">Gagal: ${response.message}</td></tr>`;
+    }
+}
+
+// 5. MASTER PEDAGANG
+async function fetchDataPedagang() {
+    switchView('pedagang'); // Pindah ke halaman pedagang
+    ui.sidebar.classList.remove('active'); // Tutup sidebar di HP
+
+    const tbody = document.getElementById('tbody-pedagang');
+    if (!tbody) return; 
+
+    tbody.innerHTML = '<tr><td colspan="5" style="text-align: center;">Memuat data...</td></tr>';
+    
+    showLoading(true);
+    const response = await api('getPedagang'); 
+    showLoading(false);
+
+    if (response.success) {
+        tbody.innerHTML = ''; 
+        if(response.data.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="5" style="text-align: center;">Belum ada data pedagang</td></tr>';
+            return;
+        }
+
+        response.data.forEach(pdg => {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td>${pdg.pedagang_id}</td>
+                <td>${pdg.nama}</td>
+                <td>${pdg.nama_usaha}</td>
+                <td>${pdg.kategori}</td>
+                <td><span class="badge" style="background:${pdg.status === 'AKTIF' ? 'green' : 'red'}; color:white; padding:3px 8px; border-radius:4px;">${pdg.status}</span></td>
+            `;
+            tbody.appendChild(tr);
+        });
+    } else {
+        tbody.innerHTML = `<tr><td colspan="5" style="text-align: center; color: red;">Gagal: ${response.message}</td></tr>`;
+    }
+}
+
+// 6. LAPORAN BAZAR
+function loadLaporan() {
+    switchView('laporan');
+    ui.sidebar.classList.remove('active');
 }
